@@ -2,9 +2,12 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { CanvasAiInput } from "@/components/canvas-ai-input";
+import { CanvasColumnHeaders } from "@/components/canvas-column-headers";
 import { CanvasControls } from "@/components/canvas-controls";
+import { CanvasEmptyState } from "@/components/canvas-empty-state";
 import { CanvasInspector } from "@/components/canvas-inspector";
-import { CanvasToolbar } from "@/components/canvas-toolbar";
+import { CanvasToolbox, type ToolboxTool } from "@/components/canvas-toolbox";
 import { BOARD_DIMS } from "@/lib/board-items";
 import { computeFitTransform } from "@/lib/canvas-view";
 import type { Cluster, GraphNode, SearchResponse, ViewTransform } from "@/lib/types";
@@ -32,6 +35,7 @@ export default function HomePage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [transform, setTransform] = useState<ViewTransform>({ x: 0, y: 0, scale: 1 });
   const [viewport, setViewport] = useState({ w: 0, h: 0 });
+  const [activeTool, setActiveTool] = useState<ToolboxTool>("cards");
 
   useEffect(() => {
     const el = containerRef.current;
@@ -132,7 +136,13 @@ export default function HomePage() {
         onNodeMove={handleNodeMove}
       />
 
-      <CanvasToolbar
+      <CanvasToolbox activeTool={activeTool} onToolChange={setActiveTool} />
+
+      <CanvasEmptyState visible={!loading && nodes.length === 0} />
+
+      <CanvasColumnHeaders visible={nodes.length > 0} transform={transform} />
+
+      <CanvasAiInput
         query={query}
         loading={loading}
         expandedQuery={expandedQuery}

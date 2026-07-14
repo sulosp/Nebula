@@ -43,10 +43,13 @@ export function computeFitTransform(
   const contentH = Math.max(maxY - minY, 180);
   const cx = (minX + maxX) / 2;
   const cy = (minY + maxY) / 2;
-  const padding = 120;
+  const paddingLeft = 160;
+  const paddingRight = 48;
+  const paddingTop = 100;
+  const paddingBottom = 160;
   const scale = Math.min(
-    (viewportW - padding * 2) / contentW,
-    (viewportH - padding * 2) / contentH,
+    (viewportW - paddingLeft - paddingRight) / contentW,
+    (viewportH - paddingTop - paddingBottom) / contentH,
     1.15,
   );
 

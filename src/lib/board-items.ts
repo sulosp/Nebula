@@ -1,9 +1,9 @@
 import type { BoardItemKind, GraphNode } from "./types";
 
 export const BOARD_DIMS: Record<BoardItemKind, { width: number; height: number }> = {
-  link: { width: 248, height: 128 },
-  text: { width: 280, height: 196 },
-  image: { width: 240, height: 240 },
+  link: { width: 375, height: 95 },
+  text: { width: 375, height: 189 },
+  image: { width: 272, height: 189 },
 };
 
 export function getNodeSize(node: Pick<GraphNode, "kind" | "width" | "height">) {

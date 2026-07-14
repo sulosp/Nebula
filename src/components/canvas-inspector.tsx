@@ -17,7 +17,7 @@ const KIND_LABELS = {
 
 export function CanvasInspector({ node, onBranchSimilar, onClose }: Props) {
   return (
-    <div className="pointer-events-none absolute right-4 top-24 z-20 w-[min(320px,calc(100vw-2rem))]">
+    <div className="pointer-events-none absolute right-4 top-1/2 z-20 w-[min(320px,calc(100vw-2rem))] -translate-y-1/2">
       <div className="pointer-events-auto overflow-hidden rounded-xl border border-white/10 bg-[#1a1a1a]/92 shadow-2xl shadow-black/40 backdrop-blur-md">
         {node.kind === "image" && node.imageUrl && (
           <div className="relative aspect-square bg-black/30">

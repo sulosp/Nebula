@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { buildAiTextNodes, seedResultPositions } from "@/lib/build-board";
+import { layoutBoardNodes } from "@/lib/build-board";
 import { clustersForItems, CORPUS } from "@/lib/corpus";
 import { expandQuery } from "@/lib/query-expansion";
 import { searchCorpus, searchWithEmbeddings } from "@/lib/search";
-import type { GraphNode, SearchResponse } from "@/lib/types";
+import type { SearchResponse } from "@/lib/types";
 
 export async function POST(request: Request) {
   const body = (await request.json()) as { query?: string };
@@ -18,9 +18,7 @@ export async function POST(request: Request) {
     results = searchCorpus(CORPUS, "editorial dark", expandedQuery, 8);
   }
 
-  const resultNodes = seedResultPositions(results);
-  const aiNodes = buildAiTextNodes(query, expandedQuery, results);
-  const nodes: GraphNode[] = [...aiNodes, ...resultNodes];
+  const nodes = layoutBoardNodes(query, expandedQuery, results);
   const clusters = clustersForItems(nodes);
 
   const response: SearchResponse = {

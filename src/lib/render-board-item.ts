@@ -98,7 +98,7 @@ export async function createBoardItemSprite(
     addShadow(PIXI, card, w, h);
     addBackground(PIXI, card, w, h, COLORS.card);
 
-    const imageArea = h - 44;
+    const imageArea = h - 36;
     try {
       if (!node.imageUrl) throw new Error("missing image");
       const texture = await PIXI.Assets.load(node.imageUrl);
@@ -137,60 +137,33 @@ export async function createBoardItemSprite(
     addShadow(PIXI, card, w, h);
     addBackground(PIXI, card, w, h, COLORS.linkBg);
 
-    const badge = new PIXI.Graphics();
-    badge.roundRect(12, 12, 52, 22, 4);
-    badge.fill({ color: COLORS.accent, alpha: 0.18 });
-    badge.stroke({ color: COLORS.accent, alpha: 0.45, width: 1 });
-    card.addChild(badge);
-
-    const badgeText = new PIXI.Text({ text: "LINK", style: { ...labelStyle, fontSize: 9 } });
-    badgeText.x = 22;
-    badgeText.y = 16;
-    card.addChild(badgeText);
-
-    const icon = new PIXI.Text({ text: "↗", style: { fontFamily: "system-ui", fontSize: 18, fill: "#87c3ff" } });
-    icon.x = w - 34;
-    icon.y = 14;
-    card.addChild(icon);
-
-    const title = new PIXI.Text({ text: node.title, style: titleStyle });
-    title.x = 12;
-    title.y = 44;
+    const title = new PIXI.Text({
+      text: node.title,
+      style: {
+        ...titleStyle,
+        fontSize: 13,
+        wordWrap: true,
+        wordWrapWidth: w - 32,
+        lineHeight: 18,
+      },
+    });
+    title.x = 16;
+    title.y = 16;
     card.addChild(title);
 
     const host = new PIXI.Text({
-      text: hostnameFromUrl(node.url) || node.source,
-      style: { ...metaStyle, fill: "#87c3ff" },
+      text: node.url ?? hostnameFromUrl(node.url) ?? node.source,
+      style: {
+        ...metaStyle,
+        fontSize: 11,
+        fill: "#87c3ff",
+        wordWrap: true,
+        wordWrapWidth: w - 32,
+      },
     });
-    host.x = 12;
-    host.y = 68;
+    host.x = 16;
+    host.y = 16 + title.height + 6;
     card.addChild(host);
-
-    const source = new PIXI.Text({ text: `${node.source} · ${node.tags.slice(0, 2).join(" · ")}`, style: metaStyle });
-    source.x = 12;
-    source.y = 92;
-    card.addChild(source);
-
-    if (node.imageUrl) {
-      try {
-        const texture = await PIXI.Assets.load(node.imageUrl);
-        if (!cancelled()) {
-          const thumb = new PIXI.Sprite(texture);
-          thumb.x = w - 72;
-          thumb.y = h - 56;
-          thumb.width = 56;
-          thumb.height = 44;
-          card.addChild(thumb);
-          const thumbMask = new PIXI.Graphics();
-          thumbMask.roundRect(w - 72, h - 56, 56, 44, 4);
-          thumbMask.fill(0xffffff);
-          card.addChild(thumbMask);
-          thumb.mask = thumbMask;
-        }
-      } catch {
-        /* optional thumb */
-      }
-    }
   } else {
     addShadow(PIXI, card, w, h);
     addBackground(PIXI, card, w, h, COLORS.textBg);
