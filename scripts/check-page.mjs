@@ -9,12 +9,14 @@ page.on("console", (m) => {
   if (m.type() === "error") errors.push(`CONSOLE: ${m.text()}`);
 });
 
-await page.goto("http://localhost:3012", { waitUntil: "networkidle", timeout: 120000 });
-await page.waitForTimeout(5000);
+await page.goto("http://localhost:3000", { waitUntil: "networkidle", timeout: 120000 });
+await page.getByText("Website templates you can actually ship").waitFor({ timeout: 30000 });
+await page.getByRole("link", { name: "Browse templates" }).click();
+await page.getByRole("heading", { name: "Templates" }).waitFor({ timeout: 15000 });
+await page.getByRole("link", { name: /Farinha/ }).first().click();
+await page.getByRole("button", { name: /Add to cart/i }).waitFor({ timeout: 15000 });
 
-const canvas = await page.locator("canvas").count();
-const loading = await page.getByText("Initializing canvas").count();
-const bodyText = await page.locator("body").innerText();
-
-console.log(JSON.stringify({ canvas, loading, errors, bodyPreview: bodyText.slice(0, 300) }, null, 2));
+const title = await page.getByRole("heading", { name: "Farinha" }).count();
+console.log(JSON.stringify({ title, errors }, null, 2));
 await browser.close();
+if (errors.length > 0 || title === 0) process.exit(1);

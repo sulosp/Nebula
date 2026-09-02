@@ -1,9 +1,12 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { clerkConfigured } from "@/lib/env";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Nebula — Spatial Visual Search",
-  description: "Explore visual inspiration as a living, physics-driven graph.",
+  title: "Nebula — FAQ chatbot for your site",
+  description:
+    "Add your FAQs, paste a script tag, and let a chatbot answer from your own content.",
 };
 
 export default function RootLayout({
@@ -11,9 +14,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+  const inner = (
     <html lang="en">
       <body className="antialiased">{children}</body>
     </html>
+  );
+
+  if (!clerkConfigured()) {
+    return inner;
+  }
+
+  return (
+    <ClerkProvider>
+      {inner}
+    </ClerkProvider>
   );
 }

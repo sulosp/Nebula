@@ -1,51 +1,25 @@
-export type BoardItemKind = "link" | "text" | "image";
-
-export type Cluster = {
+export type ClientRow = {
   id: string;
-  label: string;
+  clerk_user_id: string;
+  name: string;
+  color: string;
+  public_key: string;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  subscription_status: string;
+  created_at: string;
 };
 
-export type CorpusItem = {
+export type FaqEntry = {
   id: string;
-  kind: BoardItemKind;
-  title: string;
-  source: "Are.na" | "Behance" | "Dribbble" | "Pinterest" | "Nebula AI";
-  url?: string;
-  clusterId: string;
-  tags: string[];
-  /** Visual reference — used by image (required) and link (optional thumb) kinds */
-  imageUrl?: string;
-  /** AI or descriptive copy — used by text kind */
-  body?: string;
-  searchText: string;
-  embedding?: number[];
+  client_id: string;
+  question: string;
+  answer: string;
+  created_at: string;
 };
 
-export type SearchEdge = {
-  from: string;
-  to: string;
-};
+export const CONTACT_FALLBACK = "Please contact us.";
 
-export type GraphNode = CorpusItem & {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  vx?: number;
-  vy?: number;
-  similarity?: number;
-};
-
-export type SearchResponse = {
-  query: string;
-  expandedQuery: string;
-  clusters: Cluster[];
-  nodes: GraphNode[];
-  edges: SearchEdge[];
-};
-
-export type ViewTransform = {
-  x: number;
-  y: number;
-  scale: number;
-};
+export function isSubscriptionActive(status: string) {
+  return status === "active" || status === "trialing";
+}

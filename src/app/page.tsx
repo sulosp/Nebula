@@ -1,170 +1,88 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { CanvasAiInput } from "@/components/canvas-ai-input";
-import { CanvasColumnHeaders } from "@/components/canvas-column-headers";
-import { CanvasControls } from "@/components/canvas-controls";
-import { CanvasEmptyState } from "@/components/canvas-empty-state";
-import { CanvasInspector } from "@/components/canvas-inspector";
-import { CanvasToolbox, type ToolboxTool } from "@/components/canvas-toolbox";
-import { BOARD_DIMS } from "@/lib/board-items";
-import { computeFitTransform } from "@/lib/canvas-view";
-import type { Cluster, GraphNode, SearchResponse, ViewTransform } from "@/lib/types";
-
-const SpatialCanvas = dynamic(
-  () => import("@/components/spatial-canvas").then((m) => m.SpatialCanvas),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-full w-full items-center justify-center bg-[#141414] text-sm text-white/40">
-        Initializing canvas…
-      </div>
-    ),
-  },
-);
+import Link from "next/link";
+import { clerkConfigured } from "@/lib/env";
 
 export default function HomePage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pendingFitRef = useRef(false);
-  const [query, setQuery] = useState("dark editorial web design");
-  const [loading, setLoading] = useState(false);
-  const [expandedQuery, setExpandedQuery] = useState("");
-  const [nodes, setNodes] = useState<GraphNode[]>([]);
-  const [clusters, setClusters] = useState<Cluster[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [transform, setTransform] = useState<ViewTransform>({ x: 0, y: 0, scale: 1 });
-  const [viewport, setViewport] = useState({ w: 0, h: 0 });
-  const [activeTool, setActiveTool] = useState<ToolboxTool>("cards");
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      setViewport({
-        w: entry.contentRect.width,
-        h: entry.contentRect.height,
-      });
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const fitToContent = useCallback(
-    (items: GraphNode[]) => {
-      if (viewport.w <= 0 || viewport.h <= 0) return;
-      setTransform(computeFitTransform(items, viewport.w, viewport.h));
-    },
-    [viewport.w, viewport.h],
-  );
-
-  const runSearch = useCallback(
-    async (q: string) => {
-      setLoading(true);
-      setSelectedId(null);
-      try {
-        const res = await fetch("/api/search", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: q }),
-        });
-        if (!res.ok) throw new Error(`Search failed (${res.status})`);
-        const data = (await res.json()) as SearchResponse;
-        setQuery(data.query);
-        setExpandedQuery(data.expandedQuery);
-        setNodes(data.nodes);
-        setClusters(data.clusters);
-        pendingFitRef.current = true;
-        fitToContent(data.nodes);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fitToContent],
-  );
-
-  useEffect(() => {
-    if (pendingFitRef.current && viewport.w > 0 && nodes.length > 0) {
-      fitToContent(nodes);
-      pendingFitRef.current = false;
-    }
-  }, [viewport.w, viewport.h, nodes, fitToContent]);
-
-  useEffect(() => {
-    void runSearch("dark editorial web design");
-  }, [runSearch]);
-
-  const selected = nodes.find((n) => n.id === selectedId) ?? null;
-
-  const branchSimilar = () => {
-    if (!selected) return;
-    const siblings = nodes.filter(
-      (n) => n.clusterId === selected.clusterId && n.id !== selected.id,
-    );
-    if (siblings.length === 0) return;
-    const pick = siblings[Math.floor(Math.random() * siblings.length)];
-    const newId = `${pick.id}-branch-${Date.now()}`;
-    const dims = BOARD_DIMS[pick.kind];
-    setNodes((prev) => [
-      ...prev,
-      {
-        ...pick,
-        id: newId,
-        x: selected.x + 120,
-        y: selected.y + 80,
-        width: dims.width,
-        height: dims.height,
-      },
-    ]);
-    setSelectedId(newId);
-  };
-
-  const handleNodeMove = useCallback((id: string, x: number, y: number) => {
-    setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, x, y } : n)));
-  }, []);
+  const authReady = clerkConfigured();
 
   return (
-    <div ref={containerRef} className="fixed inset-0 overflow-hidden bg-[#141414]">
-      <SpatialCanvas
-        nodes={nodes}
-        transform={transform}
-        onTransformChange={setTransform}
-        selectedId={selectedId}
-        onSelect={setSelectedId}
-        onNodeMove={handleNodeMove}
-      />
+    <div className="site">
+      <header className="site-nav">
+        <span className="nav-brand">Nebula</span>
+        <nav className="site-links">
+          {authReady ? (
+            <>
+              <Link href="/sign-in">Log in</Link>
+              <Link className="btn btn-primary" href="/sign-up">
+                Start
+              </Link>
+            </>
+          ) : (
+            <span className="text-muted">Connect Clerk to enable signup</span>
+          )}
+        </nav>
+      </header>
 
-      <CanvasToolbox activeTool={activeTool} onToolChange={setActiveTool} />
+      <main className="site-main">
+        <section className="hero">
+          <p className="card-kicker">Phase 1 MVP</p>
+          <h1>Your FAQs, answering themselves.</h1>
+          <p className="hero-lede">
+            Sign up, type in question-and-answer pairs, paste one script tag on
+            your site. The widget answers from your FAQ or says “please contact us.”
+          </p>
+          <div className="hero-actions">
+            {authReady ? (
+              <Link className="btn btn-primary" href="/sign-up">
+                Get started — $29/mo
+              </Link>
+            ) : (
+              <span className="btn btn-secondary" aria-disabled="true">
+                Setup required
+              </span>
+            )}
+            <Link className="btn btn-secondary" href="#how">
+              How it works
+            </Link>
+          </div>
+        </section>
 
-      <CanvasEmptyState visible={!loading && nodes.length === 0} />
+        <section id="how" className="section">
+          <h2>Ship criteria</h2>
+          <div className="steps">
+            <article className="card elev-sm">
+              <p className="card-kicker">1</p>
+              <h3 className="card-title">Add your FAQ</h3>
+              <p className="card-body">A simple table. Question, answer, done.</p>
+            </article>
+            <article className="card elev-sm">
+              <p className="card-kicker">2</p>
+              <h3 className="card-title">Paste the script</h3>
+              <p className="card-body">
+                One tag with your client ID. A chat bubble appears on any site.
+              </p>
+            </article>
+            <article className="card elev-sm">
+              <p className="card-kicker">3</p>
+              <h3 className="card-title">It answers</h3>
+              <p className="card-body">
+                Groq reads only your FAQ. Unknown questions get a contact fallback.
+              </p>
+            </article>
+          </div>
+        </section>
 
-      <CanvasColumnHeaders visible={nodes.length > 0} transform={transform} />
-
-      <CanvasAiInput
-        query={query}
-        loading={loading}
-        expandedQuery={expandedQuery}
-        onQueryChange={setQuery}
-        onSearch={(q) => void runSearch(q)}
-      />
-
-      <CanvasControls
-        transform={transform}
-        onTransformChange={setTransform}
-        onFitToContent={() => fitToContent(nodes)}
-        nodeCount={nodes.length}
-        clusterCount={clusters.length}
-      />
-
-      {selected && (
-        <CanvasInspector
-          node={selected}
-          onBranchSimilar={branchSimilar}
-          onClose={() => setSelectedId(null)}
-        />
-      )}
+        <section className="section pricing-block">
+          <h2>One plan</h2>
+          <article className="card elev-md pricing-card">
+            <p className="card-kicker">FAQ bot</p>
+            <p className="price">$29<span>/month</span></p>
+            <p className="card-body">
+              Dashboard, embeddable widget, name + color branding. Inquiry history
+              comes later, only if you ask for it.
+            </p>
+          </article>
+        </section>
+      </main>
     </div>
   );
 }
