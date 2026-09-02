@@ -3,6 +3,7 @@
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const LINKS = [
   { href: "/dashboard", label: "FAQ" },
@@ -29,6 +30,7 @@ export function DashboardNav() {
           </Link>
         ))}
       </nav>
+      <ThemeToggle />
       <UserButton />
     </header>
   );

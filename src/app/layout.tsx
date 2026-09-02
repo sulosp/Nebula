@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { clerkConfigured } from "@/lib/env";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,13 +10,29 @@ export const metadata: Metadata = {
     "Add your FAQs, paste a script tag, and let a chatbot answer from your own content.",
 };
 
+const clerkAppearance = {
+  variables: {
+    colorBackground: "var(--color-surface)",
+    colorPrimary: "var(--color-accent)",
+    colorText: "var(--color-text)",
+    colorTextSecondary: "var(--color-text)",
+    colorInputBackground: "var(--color-bg)",
+    colorInputText: "var(--color-text)",
+    colorNeutral: "var(--color-text)",
+    borderRadius: "8px",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const inner = (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );
@@ -24,9 +41,5 @@ export default function RootLayout({
     return inner;
   }
 
-  return (
-    <ClerkProvider>
-      {inner}
-    </ClerkProvider>
-  );
+  return <ClerkProvider appearance={clerkAppearance}>{inner}</ClerkProvider>;
 }

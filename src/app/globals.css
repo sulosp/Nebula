@@ -2,10 +2,6 @@
 @import "../styles/nocturne.css";
 @import "../styles/app.css";
 
-:root {
-  color-scheme: dark;
-}
-
 html,
 body {
   margin: 0;

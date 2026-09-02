@@ -1,7 +1,9 @@
 /* Nocturne — design-system tokens and component classes. This file is the source of truth for the system's look; retune it here and see readme.md. */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
   --color-bg: #161826;
   --color-surface: #232532;
   --color-text: #e9e9ed;
@@ -80,10 +82,27 @@
   --shadow-lg: 0 0 0 1px #9397ab, 0 16px 40px rgba(0,0,0,0.65);
 }
 
+[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #f3f5fe;
+  --color-surface: #ffffff;
+  --color-text: #1c1e28;
+  --color-accent: #5d5294;
+  --color-accent-2: #5c5783;
+  --color-divider: color-mix(in srgb, #1c1e28 12%, transparent);
+  --shadow-sm: 0 0 0 1px color-mix(in srgb, #1c1e28 8%, transparent);
+  --shadow-md: 0 0 0 1px color-mix(in srgb, #1c1e28 10%, transparent), 0 8px 24px rgba(22, 24, 38, 0.08);
+  --shadow-lg: 0 0 0 1px color-mix(in srgb, #1c1e28 12%, transparent), 0 18px 40px rgba(22, 24, 38, 0.12);
+}
+
+html {
+  background: var(--color-bg);
+}
 body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
+  transition: background-color 160ms ease, color 160ms ease;
 }
 h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
 
@@ -227,6 +246,9 @@ textarea.input { min-height: 90px; resize: vertical; }
 .tag-accent { background: var(--color-accent-800); color: var(--color-accent-100); }
 .tag-accent-2 { background: var(--color-accent-2-800); color: var(--color-accent-2-100); }
 .tag-neutral { background: var(--color-neutral-800); color: var(--color-neutral-100); }
+[data-theme="light"] .tag-accent { background: var(--color-accent-200); color: var(--color-accent-800); }
+[data-theme="light"] .tag-accent-2 { background: var(--color-accent-2-200); color: var(--color-accent-2-800); }
+[data-theme="light"] .tag-neutral { background: var(--color-neutral-200); color: var(--color-neutral-800); }
 .tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
 
 /* — navigation — */

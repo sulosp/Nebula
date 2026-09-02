@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { clerkConfigured } from "@/lib/env";
 
 export default function HomePage() {
@@ -9,6 +10,7 @@ export default function HomePage() {
       <header className="site-nav">
         <span className="nav-brand">Nebula</span>
         <nav className="site-links">
+          <ThemeToggle />
           {authReady ? (
             <>
               <Link href="/sign-in">Log in</Link>
