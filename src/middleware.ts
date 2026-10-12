@@ -1,9 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { clerkConfigured } from "@/lib/env";
 
 const isPublicRoute = createRouteMatcher([
   "/",
+  "/templates(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/embed(.*)",
@@ -12,17 +13,26 @@ const isPublicRoute = createRouteMatcher([
   "/api/stripe/webhook(.*)",
 ]);
 
+function nextWithPath(req: NextRequest) {
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-pathname", req.nextUrl.pathname);
+  return NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+}
+
 const clerk = clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect();
   }
+  return nextWithPath(req);
 });
 
 export default function middleware(
   ...args: Parameters<typeof clerk>
-): ReturnType<typeof clerk> | NextResponse {
+): ReturnType<typeof clerk> {
   if (!clerkConfigured()) {
-    return NextResponse.next();
+    return nextWithPath(args[0]);
   }
   return clerk(...args);
 }
