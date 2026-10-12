@@ -48,6 +48,7 @@ Dashboard FAQ + widget settings are gated on an active Stripe subscription (test
 ## Routes
 
 - `/` landing
+- `/templates` Folio, DSGVO-ready website templates for the German market (`/templates/impressum`, `/templates/datenschutz`)
 - `/sign-in` `/sign-up` Clerk
 - `/dashboard` FAQ table
 - `/dashboard/settings` name, color, script tag
